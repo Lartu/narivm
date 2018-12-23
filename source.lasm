@@ -15,9 +15,14 @@ PRINT
 PRINT
 "Hola, todo bien che?"
 " Soy yo, peter!"
+;INPUT
 JOIN
 COPY
 PRINT
+"mkdir nuevodir"
+SYS-EXEC
+PRINT
+HALT
 PRINT
 "Me como"
 "Los mocos"

@@ -1,4 +1,6 @@
 //TODO arreglar que esto revienta si el programa tiene más de int lineas
+//(no debería pasar eso ya, but who knows, revisar).
+//TODO keystrokes (toco y actúa, espera hasta que no toco)
 
 #include <iostream>
 #include <fstream>
@@ -8,7 +10,15 @@
 #include <limits>
 #include <cmath>
 #include <map>
+#include <cstdlib>
 #include "cpptrim.h"
+
+//Para exec incluyo esto también
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <array>
 
 using namespace std;
 
@@ -134,6 +144,19 @@ vector<string> stylize(vector<string> & lines)
         new_lines.push_back(lines[i]);
     }
     return new_lines;
+}
+
+std::string exec(const char* cmd) {
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
 }
 
 bool is_number (string number) {
@@ -464,6 +487,33 @@ void execute(vector<string> & lines)
                 a.pop();
             }
             cout << " ^^^^^^^^^^^^" << endl;
+        }
+        // - Input line to stack -
+        else if(token == "INPUT"){
+			string s = "";
+			getline(cin, s);
+            alfanum in(s);
+            vm_stack.push(in);
+        }
+        // - Halt and exit -
+        else if(token == "HALT"){
+			exit(0);
+        }
+        // - Run system command and push output -
+        else if(token == "SYS-EXEC-OUT"){
+			check_stack_size(1);
+            alfanum a = vm_stack.top();
+            vm_stack.pop();
+            alfanum c(exec(a.txt_value().c_str()));
+            vm_stack.push(c);
+        }
+        // - Run system command and push exit value -
+        else if(token == "SYS-EXEC"){
+			check_stack_size(1);
+            alfanum a = vm_stack.top();
+            vm_stack.pop();
+            alfanum c(system(a.txt_value().c_str()));
+            vm_stack.push(c);
         }
         // - Error -
         else{

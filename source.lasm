@@ -19,10 +19,12 @@ PRINT
 JOIN
 COPY
 PRINT
-"mkdir nuevodir"
+"mkdir -p nuevodir"
+SYS-EXEC
+"rm -r nuevodir"
 SYS-EXEC
 PRINT
-HALT
+;HALT
 PRINT
 "Me como"
 "Los mocos"

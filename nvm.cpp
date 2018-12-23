@@ -47,9 +47,9 @@ public:
     }
     void print(){
         if(this->is_number()){
-            cout << this -> num_value() << endl;
+            cout << this -> num_value();
         }else{
-            cout << this -> txt_value() << endl;
+            cout << this -> txt_value();
         }
     }
 };
@@ -215,6 +215,13 @@ void execute(vector<string> & lines)
         else if(token == "PRINT"){
             check_stack_size(1);
             vm_stack.top().print();
+            vm_stack.pop();
+        }
+        // - Print top of stack -
+        else if(token == "PRINTLN"){
+            check_stack_size(1);
+            vm_stack.top().print();
+            cout << endl;
             vm_stack.pop();
         }
         // - Add top of stack -
@@ -513,6 +520,27 @@ void execute(vector<string> & lines)
             alfanum a = vm_stack.top();
             vm_stack.pop();
             alfanum c(system(a.txt_value().c_str()));
+            vm_stack.push(c);
+        }
+        // - Get number value of string -
+        else if(token == "TO-NUM"){
+			check_stack_size(1);
+            alfanum a = vm_stack.top();
+            alfanum c(get_number(a.txt_value()));
+            vm_stack.push(c);
+        }
+        // - Get string representation of number -
+        else if(token == "TO-STR"){
+			check_stack_size(1);
+            alfanum a = vm_stack.top();
+            alfanum c(to_string(a.num_value()));
+            vm_stack.push(c);
+        }
+        // - Get aboslute value of number -
+        else if(token == "ABS"){
+			check_stack_size(1);
+            alfanum a = vm_stack.top();
+            alfanum c(abs(a.num_value()));
             vm_stack.push(c);
         }
         // - Error -

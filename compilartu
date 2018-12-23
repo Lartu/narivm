@@ -1,0 +1,1 @@
+g++ nvm.cpp -o nvm -std=c++11

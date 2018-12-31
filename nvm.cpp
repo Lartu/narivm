@@ -203,7 +203,7 @@ void execute(vector<string> & lines)
             vm_stack.push(value);
         }
         // - Push string -
-        else if(token.size() > 2 && token[0] == '"' && token[token.size() - 1] == '"'){
+        else if(token.size() >= 2 && token[0] == '"' && token[token.size() - 1] == '"'){
             alfanum value(token.substr(1, token.size()-2));
             vm_stack.push(value);
         }
@@ -533,7 +533,11 @@ void execute(vector<string> & lines)
         else if(token == "TO-STR"){
 			check_stack_size(1);
             alfanum a = vm_stack.top();
-            alfanum c(to_string(a.num_value()));
+            string num = to_string(a.num_value());
+            num.erase (num.find_last_not_of('0') + 1, std::string::npos);
+            if(num[num.size() - 1] == '.')
+				num = num.substr(0, num.size()-1);
+            alfanum c(num);
             vm_stack.push(c);
         }
         // - Get aboslute value of number -

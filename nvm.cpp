@@ -13,6 +13,12 @@
 #include <cstdlib>
 #include "cpptrim.h"
 
+//Cosas del include de mega
+#include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+#include <string.h>
+
 //Para exec incluyo esto también
 #include <cstdio>
 #include <memory>
@@ -23,6 +29,8 @@
 using namespace std;
 
 bool debug = false;
+
+map<string, void*> libraries;
 
 class alfanum{
 private:
@@ -146,6 +154,12 @@ vector<string> stylize(vector<string> & lines)
         new_lines.push_back(lines[i]);
     }
     return new_lines;
+}
+
+void panic(const char* message) {
+	fprintf(stderr, "\033[1;31mNariVM Panic:\033[0m ");
+	fprintf(stderr, "%s\n", message);
+	exit(-1);
 }
 
 std::string exec(const char* cmd) {
@@ -618,6 +632,68 @@ void execute(vector<string> & lines)
             if(a.num_value() == 0) continue;
             unsigned long int tag_line = vm_stack.top().num_value();
             i = tag_line - 1;
+        }
+        // - Load Lib - //TODO revisar esto porque lo hice a ciegas
+        else if(token == "LOADLIB"){
+			check_stack_size(1);
+			string libname = vm_stack.top().txt_value();
+			vm_stack.pop();
+			if(debug){
+				cout << "Loading library '" << libname << "'..." << endl;
+			}
+			//Load library
+			char* lib_name = libname.c_str();
+			void* lib_ptr = dlopen(lib_name, RTLD_LAZY);
+			if(!lib_ptr) panic(dlerror());
+			libraries.insert(make_pair(libname, lib_ptr));
+			//Free library
+			//free(lib_name); TODO fix
+			if(debug){
+				cout << "'" << libname << "' loaded." << endl;
+			}
+		}
+		// - Call lib function -
+		//TODO ver cómo pasar parámetros
+		else if(token == "LIBCALL"){
+			check_stack_size(2);
+			string fun_name = vm_stack.top().txt_value();
+			vm_stack.pop();
+			string libname = vm_stack.top().txt_value();
+			vm_stack.pop();
+			void* lib_ptr = libraries.at(libname);
+			void (*lib_fun)() = dlsym(lib_ptr, fun_name.c_str());
+			if(!lib_fun)
+				panic(dlerror());
+			lib_fun();
+		}
+		// - Store Auxiliar Value POP -
+        else if(token == "TOAUX-POP"){
+            check_stack_size(2);
+            alfanum a = vm_stack.top(); // Value to store
+            vm_stack.pop();
+            string aux_name = vm_stack.top().txt_value();
+            vm_stack.pop();
+            //Not optimal
+            if(aux_map.count(aux_name) == 0){
+                aux_map.insert(make_pair(aux_name, a));
+            }else{
+                aux_map.at(aux_name) = a;
+            }
+        }
+        // - Get Auxiliar Value POP -
+        else if(token == "AUX-POP"){
+			check_stack_size(1);
+            string aux_name = vm_stack.top().txt_value();
+            vm_stack.pop();
+            //Not optimal
+            if(aux_map.count(aux_name) == 0){
+                cerr << "\033[1;31mError: Undeclared auxiliar: \033[1;37m";
+                cerr << aux_name;
+                cerr << "\033[0m" << endl;
+                exit(1);
+            }else{
+                vm_stack.push(aux_map.at(aux_name));
+            }
         }
         // - Error -
         else{

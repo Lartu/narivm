@@ -559,6 +559,7 @@ void execute(vector<string> & lines)
         else if(token == "TO-STR"){
 			check_stack_size(1);
             alfanum a = vm_stack.top();
+            vm_stack.pop();
             string num = to_string(a.num_value());
             num.erase (num.find_last_not_of('0') + 1, std::string::npos);
             if(num[num.size() - 1] == '.')
@@ -715,7 +716,7 @@ int main (int argc, char** argv){
     }
     // - Push arguments to the stack **as strings** -
     else{
-		for(int i = 0; i < args.size(); ++i){
+		for(int i = args.size()-1; i >=0; --i){
 			alfanum a(args[i]);
 			vm_stack.push(a);
 		}
@@ -724,7 +725,7 @@ int main (int argc, char** argv){
     ifstream file(args[0]);
     // - Fail if the file couldn't be loaded -
     if(!file.is_open()){
-        cerr << "\033[1;31mError: I couldn't open the file.\033[0m" << endl;
+        cerr << "\033[1;31mError: NariVM couldn't open the requested file.\033[0m" << endl;
         exit(1);
     }
     // - Get file contents -

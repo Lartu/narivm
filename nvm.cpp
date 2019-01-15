@@ -22,6 +22,8 @@
 
 using namespace std;
 
+bool debug = false;
+
 class alfanum{
 private:
     long double n_value = 0;
@@ -196,6 +198,7 @@ void check_stack_size(unsigned int size){
 void execute(vector<string> & lines)
 {
     for(unsigned long int i = 0; i < lines.size(); ++i){
+		if(debug) cout << i+1 << " ) " << lines[i] << endl;
         string token = lines[i];
         // - Push number -
         if(is_number(token)){
@@ -486,14 +489,22 @@ void execute(vector<string> & lines)
         }
         // - Print Stack for Debugging Purposes -
         else if(token == "PRINT-STACK"){
+			if(!debug) continue;
             stack <alfanum> a = vm_stack;
-            cout << " ^^^^^^^^^^^^" << endl;
+            cout << endl << "****** STACK ******" << endl;
             while (!a.empty()) {
                 cout << " -> ";
                 a.top().print();
+                cout << " ";
+                cout << (a.top().is_number() ? "(num)" : "(txt)");
+                cout << endl;
                 a.pop();
             }
-            cout << " ^^^^^^^^^^^^" << endl;
+            cout << "*******************" << endl << endl;
+        }
+        // - Debug mode on / off -
+        else if(token == "DEBUG"){
+            debug = !debug;
         }
         // - Input line to stack -
         else if(token == "INPUT"){
@@ -526,6 +537,7 @@ void execute(vector<string> & lines)
         else if(token == "TO-NUM"){
 			check_stack_size(1);
             alfanum a = vm_stack.top();
+            vm_stack.pop();
             alfanum c(get_number(a.txt_value()));
             vm_stack.push(c);
         }
@@ -547,6 +559,66 @@ void execute(vector<string> & lines)
             alfanum c(abs(a.num_value()));
             vm_stack.push(c);
         }
+        // - Pop jump-
+        else if(token == "JMP-POP"){
+			check_stack_size(1);
+            string tag_name = vm_stack.top().txt_value();
+            unsigned long int tag_line = 0;
+            try {
+                tag_line = tag_map.at(tag_name);
+            }
+            catch (const out_of_range & ia) {
+                cerr << "\033[1;31mError: Undeclared tag: \033[1;37m";
+                cerr << tag_name;
+                cerr << "\033[0m" << endl;
+                exit(1);
+            }
+            i = tag_line - 1;
+        }
+        // - Conditional Pop Jump -
+        else if(token == "IF-POP"){
+            check_stack_size(2);
+            alfanum a = vm_stack.top();
+            vm_stack.pop();
+            if(a.num_value() == 0) continue;
+            string tag_name = vm_stack.top().txt_value();
+            unsigned long int tag_line = 0;
+            try {
+                tag_line = tag_map.at(tag_name);
+            }
+            catch (const out_of_range & ia) {
+                cerr << "\033[1;31mError: Undeclared tag: \033[1;37m";
+                cerr << tag_name;
+                cerr << "\033[0m" << endl;
+                exit(1);
+            }
+            i = tag_line - 1;
+        }
+        // - Push stack height -
+        else if(token == "STACK-SIZE"){
+            vm_stack.push(vm_stack.size());
+        }
+        // - Push IP -
+        else if(token == "IP"){
+            alfanum value(i+1);
+            vm_stack.push(value);
+        }
+        // - IP jump-
+        else if(token == "JMP-IP-POP"){
+			check_stack_size(1);
+            unsigned long int tag_line = vm_stack.top().num_value();
+            vm_stack.pop();
+            i = tag_line - 1;
+        }
+        // - Conditional IP Jump -
+        else if(token == "IF-IP-POP"){
+            check_stack_size(2);
+            alfanum a = vm_stack.top();
+            vm_stack.pop();
+            if(a.num_value() == 0) continue;
+            unsigned long int tag_line = vm_stack.top().num_value();
+            i = tag_line - 1;
+        }
         // - Error -
         else{
             cerr << "\033[1;31mError: Unexpected command: \033[1;37m";
@@ -561,9 +633,16 @@ int main (int argc, char** argv){
     // - Get command line arguments -
     vector<string> args(argv + 1, argv + argc);
     // - Fail if file was not passed -
-    if(args.size() != 1){
-        cerr << "\033[1;31mError: I expect one and only one source file argument.\033[0m" << endl;
+    if(args.size() == 0){
+        cerr << "\033[1;31mError: I expect a source file.\033[0m" << endl;
         exit(1);
+    }
+    // - Push arguments to the stack **as strings** -
+    else{
+		for(int i = 0; i < args.size(); ++i){
+			alfanum a(args[i]);
+			vm_stack.push(a);
+		}
     }
     // - Load file -
     ifstream file(args[0]);

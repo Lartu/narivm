@@ -1,0 +1,90 @@
+;Pigsay - by Martín del Río
+;(Usage: nvm pigsay.nvm "Something to say!")
+;                      \   /\_/\_______
+;                       (¤¤ ' '        )~
+;                          \__________/
+;                            V V   V V
+
+	;Pop filename
+	POP
+@start
+	;Check if we have something to say
+	STACK-SIZE
+	1
+	>=
+	PRINT-STACK
+	IF:say
+	"Hey! You have to tell me what to say!"
+	PRINTLN
+	"Try passing some arguments the next time!"
+	PRINTLN
+	HALT
+@say
+	COPY
+	LENGTH
+	TOAUX:length
+	AUX:length
+	20
+	>
+	NOT
+	IF:noDecrease
+	20
+	TOAUX:length
+@noDecrease
+	"("
+	SWAP
+	")"
+	JOIN
+	JOIN
+	PRINTLN
+	""
+	TOAUX:espacio
+@loopCoso
+	AUX:length
+	0
+	>
+	NOT
+	IF:vaca
+	AUX:length
+	1
+	-
+	TOAUX:length
+	AUX:espacio
+	" "
+	JOIN
+	TOAUX:espacio
+	JMP:loopCoso
+@vaca
+	AUX:espacio
+	"  "
+	JOIN
+	TOAUX:espacio
+	AUX:espacio
+	"\"
+	JOIN
+	PRINT
+	AUX:espacio
+	" "
+	JOIN
+	TOAUX:espacio
+
+	;Draw cow
+	"   /\_/\_______"
+	PRINTLN
+	AUX:espacio
+	PRINT
+	"(¤¤ ' '        )~"
+	PRINTLN
+	AUX:espacio
+	PRINT
+	"   \__________/"
+	PRINTLN
+	AUX:espacio
+	PRINT
+	"     V V   V V"
+	PRINTLN
+	;Check if stack length is >= 1
+	STACK-SIZE
+	1
+	>=
+	IF:start

@@ -1,0 +1,31 @@
+PRINT-STACK
+"Programa de prueba de subrutinas"
+PRINTLN
+"Esto no es una subrutina"
+PRINTLN
+
+; Estructura para hacer un call -->
+	IP
+	3
+	+
+	JMP:subrutina
+; <-- Estructura para hacer un call
+
+"Listo!"
+PRINTLN
+HALT
+@subrutina
+	"Esta es mi subrutina!"
+	PRINTLN
+	IP
+	3
+	+
+	JMP:otraSubrutina
+	PRINT-STACK
+	JMP-IP-POP
+@otraSubrutina
+	"Faa! Otra subrutina!"
+	PRINTLN
+	"Re piola!"
+	PRINTLN
+	JMP-IP-POP

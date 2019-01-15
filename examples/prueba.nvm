@@ -1,0 +1,121 @@
+;
+; INTRODUCTORY MESSAGE
+;
+"This is a NariVM program designed to show how to use the NariVM."
+PRINTLN
+"The NariVM (nvm) is a kind-of-virtual-machine designed to be easy"
+PRINTLN
+"to implement and to make programming language creation easier by"
+PRINTLN
+"creating languages that target the nvm."
+PRINTLN
+""
+PRINTLN
+"To list available commands use the 'list' command."
+PRINTLN
+
+;
+; COMMAND INPUT
+;
+@enterCommand
+"command> "
+PRINT
+INPUT
+
+;
+; CHECK ENTERED COMMAND
+;
+TOAUX:command
+AUX:command
+"list"
+==
+IF:list
+AUX:command
+"number"
+==
+IF:number
+AUX:command
+"string"
+==
+IF:string
+AUX:command
+"tag"
+==
+IF:tag
+"Unknown command '"
+AUX:command
+JOIN
+"'. Use 'list' to show available commands."
+JOIN
+PRINTLN
+
+;
+; JUMP AGIAN TO COMMAND INPUT
+;
+JMP:enterCommand
+
+;
+; COMMAND LISTING
+;
+@list
+"Available commands: number, string, tag, PRINT, PRINTLN, +, -, *, /,"
+PRINTLN
+"%, JOIN, POP, COPY, SWAP, ROTATE, ==, <, >, <=, >=, NOT, LENGTH,"
+PRINTLN
+"CHARAT, IF, JMP, TOAUX, AUX, PRINT-STACK, INPUT, HALT, SYS-EXEC,"
+PRINTLN
+"SYS-EXEC-OUT, TO-NUM, TO-STR, ABS, JMP-POP, IF-POP, STACK-SIZE"
+PRINTLN
+"IP, JMP-IP-POP, IF-IP-POP, LOADLIB, LIBCALL, AUX-POP, TOAUX-POP"
+PRINTLN
+"Write a command to read more information about it. Case sensitive."
+PRINTLN
+"For information about argument passage enter 'arguments'"
+PRINTLN
+JMP:enterCommand
+
+;
+; NUMBER
+;
+@number
+"Any number written on a line of nvm code will be pushed to the stack"
+PRINTLN
+"when execution reaches said point."
+PRINTLN
+"Example:"
+PRINTLN
+197
+PRINTLN
+-123.54
+PRINTLN
+JMP:enterCommand
+
+;
+; STRING
+;
+@string
+"Strings in nvm are enclosed between "quotes". Any string found on a"
+PRINTLN
+"line of nvm code will be pushed to the stack when execution reaches"
+PRINTLN
+"said point."
+PRINTLN
+"Example:"
+PRINTLN
+""Hello there!""
+PRINTLN
+""This is a string!""
+PRINTLN
+JMP:enterCommand
+
+;
+; TAG
+;
+@tag
+"Tags in nvm are written prefixed with the sigil @, for example @main."
+PRINTLN
+"A tag defines a point in code and commands like IF, JMP, IF-POP and"
+PRINTLN
+"JMP-POP can be used to jump to that line of code."
+PRINTLN
+JMP:enterCommand

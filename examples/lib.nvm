@@ -1,0 +1,20 @@
+"Library Loading NariVM Test"
+PRINTLN
+
+;Turn DEBUG MODE on
+;DEBUG
+
+;Push library name
+"libpitoB.so"
+LOADLIB
+
+PRINT-STACK
+
+;Run lartulang_pito() from libpitoB.so
+"libpitoB.so"
+"lartulang_pito"
+LIBCALL
+
+"Yay!"
+PRINTLN
+HALT

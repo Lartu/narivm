@@ -1,2 +1,2 @@
 c++ nvm.cpp -o nvm -std=c++11 -ldl -fpermissive
-cp nvm ~/Bin
+cp nvm ~/bin

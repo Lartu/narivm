@@ -571,6 +571,7 @@ void execute(vector<string> & lines)
         else if(token == "ABS"){
 			check_stack_size(1);
             alfanum a = vm_stack.top();
+            vm_stack.pop();
             alfanum c(abs(a.num_value()));
             vm_stack.push(c);
         }

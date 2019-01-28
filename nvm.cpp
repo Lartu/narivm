@@ -26,6 +26,8 @@
 #include <string>
 #include <array>
 
+#define NVM_FLOAT_EPSILON 0.00000001
+
 using namespace std;
 
 bool debug = false;
@@ -346,7 +348,7 @@ void execute(vector<string> & lines)
                 continue;
             }
             if(a.is_number() && b.is_number()){
-                if(a.num_value() == b.num_value())
+                if(fabs(a.num_value() - b.num_value()) < NVM_FLOAT_EPSILON)
                     vm_stack.push(v_true);
                 else
                     vm_stack.push(v_false);
@@ -379,7 +381,7 @@ void execute(vector<string> & lines)
             vm_stack.pop();
             alfanum b = vm_stack.top();
             vm_stack.pop();
-            if(b.num_value() <= a.num_value())
+            if(b.num_value() < a.num_value() || fabs(a.num_value() - b.num_value()) < NVM_FLOAT_EPSILON)
                     vm_stack.push(v_true);
                 else
                     vm_stack.push(v_false);
@@ -405,7 +407,7 @@ void execute(vector<string> & lines)
             vm_stack.pop();
             alfanum b = vm_stack.top();
             vm_stack.pop();
-            if(b.num_value() >= a.num_value())
+            if(b.num_value() > a.num_value() || fabs(a.num_value() - b.num_value()) < NVM_FLOAT_EPSILON)
                     vm_stack.push(v_true);
                 else
                     vm_stack.push(v_false);

@@ -159,9 +159,9 @@ vector<string> stylize(vector<string> & lines)
 }
 
 void panic(const char* message) {
-	fprintf(stderr, "\033[1;31mNariVM Panic:\033[0m ");
-	fprintf(stderr, "%s\n", message);
-	exit(-1);
+    fprintf(stderr, "\033[1;31mNariVM Panic:\033[0m ");
+    fprintf(stderr, "%s\n", message);
+    exit(-1);
 }
 
 std::string exec(const char* cmd) {
@@ -214,7 +214,7 @@ void check_stack_size(unsigned int size){
 void execute(vector<string> & lines)
 {
     for(unsigned long int i = 0; i < lines.size(); ++i){
-		if(debug) cout << i+1 << " ) " << lines[i] << endl;
+        if(debug) cout << i+1 << " ) " << lines[i] << endl;
         string token = lines[i];
         // - Push number -
         if(is_number(token)){
@@ -505,7 +505,7 @@ void execute(vector<string> & lines)
         }
         // - Print Stack for Debugging Purposes -
         else if(token == "PRINT-STACK"){
-			if(!debug) continue;
+            if(!debug) continue;
             stack <alfanum> a = vm_stack;
             cout << endl << "****** STACK ******" << endl;
             while (!a.empty()) {
@@ -524,18 +524,18 @@ void execute(vector<string> & lines)
         }
         // - Input line to stack -
         else if(token == "INPUT"){
-			string s = "";
-			getline(cin, s);
+            string s = "";
+            getline(cin, s);
             alfanum in(s);
             vm_stack.push(in);
         }
         // - Halt and exit -
         else if(token == "HALT"){
-			exit(0);
+            exit(0);
         }
         // - Run system command and push output -
         else if(token == "SYS-EXEC-OUT"){
-			check_stack_size(1);
+            check_stack_size(1);
             alfanum a = vm_stack.top();
             vm_stack.pop();
             alfanum c(exec(a.txt_value().c_str()));
@@ -543,7 +543,7 @@ void execute(vector<string> & lines)
         }
         // - Run system command and push exit value -
         else if(token == "SYS-EXEC"){
-			check_stack_size(1);
+            check_stack_size(1);
             alfanum a = vm_stack.top();
             vm_stack.pop();
             alfanum c(system(a.txt_value().c_str()));
@@ -551,7 +551,7 @@ void execute(vector<string> & lines)
         }
         // - Get number value of string -
         else if(token == "TO-NUM"){
-			check_stack_size(1);
+            check_stack_size(1);
             alfanum a = vm_stack.top();
             vm_stack.pop();
             alfanum c(get_number(a.txt_value()));
@@ -559,19 +559,19 @@ void execute(vector<string> & lines)
         }
         // - Get string representation of number -
         else if(token == "TO-STR"){
-			check_stack_size(1);
+            check_stack_size(1);
             alfanum a = vm_stack.top();
             vm_stack.pop();
             string num = to_string(a.num_value());
             num.erase (num.find_last_not_of('0') + 1, std::string::npos);
             if(num[num.size() - 1] == '.')
-				num = num.substr(0, num.size()-1);
+                num = num.substr(0, num.size()-1);
             alfanum c(num);
             vm_stack.push(c);
         }
         // - Get aboslute value of number -
         else if(token == "ABS"){
-			check_stack_size(1);
+            check_stack_size(1);
             alfanum a = vm_stack.top();
             vm_stack.pop();
             alfanum c(abs(a.num_value()));
@@ -579,7 +579,7 @@ void execute(vector<string> & lines)
         }
         // - Pop jump-
         else if(token == "JMP-POP"){
-			check_stack_size(1);
+            check_stack_size(1);
             string tag_name = vm_stack.top().txt_value();
             unsigned long int tag_line = 0;
             try {
@@ -623,7 +623,7 @@ void execute(vector<string> & lines)
         }
         // - IP jump-
         else if(token == "JMP-IP-POP"){
-			check_stack_size(1);
+            check_stack_size(1);
             unsigned long int tag_line = vm_stack.top().num_value();
             vm_stack.pop();
             i = tag_line - 1;
@@ -639,38 +639,38 @@ void execute(vector<string> & lines)
         }
         // - Load Lib - //TODO revisar esto porque lo hice a ciegas
         else if(token == "LOADLIB"){
-			check_stack_size(1);
-			string libname = vm_stack.top().txt_value();
-			vm_stack.pop();
-			if(debug){
-				cout << "Loading library '" << libname << "'..." << endl;
-			}
-			//Load library
-			char* lib_name = libname.c_str();
-			void* lib_ptr = dlopen(lib_name, RTLD_LAZY);
-			if(!lib_ptr) panic(dlerror());
-			libraries.insert(make_pair(libname, lib_ptr));
-			//Free library
-			//free(lib_name); TODO fix
-			if(debug){
-				cout << "'" << libname << "' loaded." << endl;
-			}
-		}
-		// - Call lib function -
-		//TODO ver cómo pasar parámetros
-		else if(token == "LIBCALL"){
-			check_stack_size(2);
-			string fun_name = vm_stack.top().txt_value();
-			vm_stack.pop();
-			string libname = vm_stack.top().txt_value();
-			vm_stack.pop();
-			void* lib_ptr = libraries.at(libname);
-			void (*lib_fun)() = dlsym(lib_ptr, fun_name.c_str());
-			if(!lib_fun)
-				panic(dlerror());
-			lib_fun();
-		}
-		// - Store Auxiliar Value POP -
+            check_stack_size(1);
+            string libname = vm_stack.top().txt_value();
+            vm_stack.pop();
+            if(debug){
+                cout << "Loading library '" << libname << "'..." << endl;
+            }
+            //Load library
+            char* lib_name = libname.c_str();
+            void* lib_ptr = dlopen(lib_name, RTLD_LAZY);
+            if(!lib_ptr) panic(dlerror());
+            libraries.insert(make_pair(libname, lib_ptr));
+            //Free library
+            //free(lib_name); TODO fix
+            if(debug){
+                cout << "'" << libname << "' loaded." << endl;
+            }
+        }
+        // - Call lib function -
+        //TODO ver cómo pasar parámetros
+        else if(token == "LIBCALL"){
+            check_stack_size(2);
+            string fun_name = vm_stack.top().txt_value();
+            vm_stack.pop();
+            string libname = vm_stack.top().txt_value();
+            vm_stack.pop();
+            void* lib_ptr = libraries.at(libname);
+            void (*lib_fun)() = dlsym(lib_ptr, fun_name.c_str());
+            if(!lib_fun)
+                panic(dlerror());
+            lib_fun();
+        }
+        // - Store Auxiliar Value POP -
         else if(token == "TOAUX-POP"){
             check_stack_size(2);
             alfanum a = vm_stack.top(); // Value to store
@@ -686,7 +686,7 @@ void execute(vector<string> & lines)
         }
         // - Get Auxiliar Value POP -
         else if(token == "AUX-POP"){
-			check_stack_size(1);
+            check_stack_size(1);
             string aux_name = vm_stack.top().txt_value();
             vm_stack.pop();
             //Not optimal
@@ -719,10 +719,10 @@ int main (int argc, char** argv){
     }
     // - Push arguments to the stack **as strings** -
     else{
-		for(int i = args.size()-1; i >=0; --i){
-			alfanum a(args[i]);
-			vm_stack.push(a);
-		}
+        for(int i = args.size()-1; i >=0; --i){
+            alfanum a(args[i]);
+            vm_stack.push(a);
+        }
     }
     // - Load file -
     ifstream file(args[0]);
